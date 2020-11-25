@@ -129,14 +129,14 @@ public class AutomataController implements Initializable {
     public String condicion(String[] text, int position){
         boolean isValid = true, recursive = false,finished = false;
         String result = "";
-        int iteration = 0;
+        int iteration = 0,conditionPosition = 0;
 
         //Evaluating conditions inside parentheses
         for(int i=0;i<2;i++){
             switch (i){
                 case 0:
-                    System.out.println("SUBSTRING: " + text[position].substring(0,10));
-                    if(text[position].substring(0,10).equals("condition(")){
+                    conditionPosition = text[position].indexOf("condition(");
+                    if(text[position].substring(conditionPosition,conditionPosition+10).equals("condition(")){
                         isValid = true;
                     }
                 break;
@@ -144,7 +144,7 @@ public class AutomataController implements Initializable {
                 case 1:
                     if(isValid){
                         int j=0;
-                        String[] conditions = text[position].substring(10).split(" ");
+                        String[] conditions = text[position].substring(conditionPosition + 10).split(" ");
                         while(!finished){
                             if(j + 3 < conditions.length && !(conditions[j].isBlank() || conditions[j].isEmpty())){
                                 if(iteration == 0) {
@@ -202,11 +202,15 @@ public class AutomataController implements Initializable {
         recursive = Boolean.parseBoolean(contentResult[0]);
         position = Integer.parseInt(contentResult[1]);
 
-        if(text[position].equals("}")){
-            position++;
-        } else {
-            isValid = false;
+        String[] finalPart = text[position].split("");
+        for(int i=0;i<finalPart.length;i++){
+            if( !(finalPart[i].isBlank() || finalPart[i].isEmpty() )){
+                if(!finalPart[i].equals("}")){
+                    isValid = false;
+                }
+            }
         }
+        position++;
 
         if(!(isValid && recursive)){
             isValid = false;
