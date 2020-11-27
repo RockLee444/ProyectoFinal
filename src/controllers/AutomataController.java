@@ -93,9 +93,16 @@ public class AutomataController implements Initializable {
             String[] resultArray = null;
             //Verifying which instruction it is...
             if(currentData.contains("data")){
-
+                result = data(text, position);
+                resultArray = result.split(" ");
+                recursive = Boolean.parseBoolean(resultArray[0]);
+                position = Integer.parseInt(resultArray[1]) - 1;
             } else if(currentData.contains("enter")){
                 //result = enter();
+                result = enter(text, position);
+                resultArray = result.split(" ");
+                recursive = Boolean.parseBoolean(resultArray[0]);
+                position = Integer.parseInt(resultArray[1]) - 1;
             } else if(currentData.contains("condition")){
                 result = condition(text, position);
                 resultArray = result.split(" ");
@@ -131,6 +138,108 @@ public class AutomataController implements Initializable {
         }
 
         return isValid;
+    }
+
+    public String data(String[] text, int position){
+        String result;
+        String[] resultArray;
+        String txt = text[position].substring(text[position].indexOf("data"),text[position].length());
+        Pattern patternId;
+        Matcher verified;
+        String[] currentData = txt.split(" ");
+        if(txt.lastIndexOf('=') > 0){
+            if(txt.charAt(txt.lastIndexOf('=') - 1) != ' ' && txt.charAt(txt.lastIndexOf('=') + 1) != ' ' ){
+                txt = txt.substring(0,txt.lastIndexOf('=')) +" = "+txt.substring(txt.lastIndexOf('=')+1, txt.length());
+            } else if(txt.charAt(txt.lastIndexOf('=') - 1) == ' ' && txt.charAt(txt.lastIndexOf('=') + 1) != ' ' ){
+                txt = txt.substring(0,txt.lastIndexOf('=')) +"= "+txt.substring(txt.lastIndexOf('=')+1, txt.length());
+            }else if(txt.charAt(txt.lastIndexOf('=') - 1) != ' ' && txt.charAt(txt.lastIndexOf('=') + 1) == ' ' ){
+                txt = txt.substring(0,txt.lastIndexOf('=')) +" ="+txt.substring(txt.lastIndexOf('=')+1, txt.length());
+            }
+            currentData = txt.split(" ");
+        }
+        if (currentData.length>4){
+            txt = currentData[0]+" "+currentData[1]+" "+currentData[2]+" ";
+            for (int i=3; i<currentData.length;i++){
+                txt += currentData[i];
+            }
+            currentData = txt.split(" ");
+        }
+        boolean isValid = true, finished = false;
+        if (currentData.length > 1 && currentData[0].equals("data")){
+            if(currentData.length == 2 && currentData[1].lastIndexOf(';') > 0){
+                String identifier = currentData[1].substring(0, currentData[1].lastIndexOf(';'));
+                patternId = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
+                verified = patternId.matcher(identifier);
+                if (!verified.find()){
+                    isValid = false;
+                }
+                if(currentData[1].lastIndexOf(';') != currentData[1].length() - 1 ){
+                    isValid = false;
+                }
+                position++;
+            } else if(currentData.length > 3 ){
+                patternId = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
+                verified = patternId.matcher(currentData[1]);
+                if(!verified.find()){
+                    isValid = false;
+                }
+                if(!currentData[2].equals("=")){
+                    isValid = false;
+                }
+                if(currentData[3].indexOf("enter") > -1){
+                    result = enter(text, position);
+                    resultArray = result.split(" ");
+                    isValid = Boolean.parseBoolean(resultArray[0]);
+                    position = Integer.parseInt(resultArray[1]);
+                }else if(currentData[3].lastIndexOf(';') == currentData[3].length()-1){
+                    String parameter = currentData[3].substring(0,currentData[3].lastIndexOf(';'));
+                    String[] parameters = parameter.split("\\+");
+                    for(int i = 0; i < parameters.length; i++){
+                        patternId = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
+                        if(parameters[i].charAt(0) == '"' && parameters[i].charAt(parameters[i].length()-1) == '"'){
+                            parameters[i] = parameters[i].substring(1, parameters[i].length()-1);
+                            patternId = Pattern.compile("([\\w])$");
+                        }
+                        verified = patternId.matcher(parameters[i]);
+                        if(!verified.find()){
+                            isValid = false;
+                        }
+                    }
+                    position++;
+                }else{
+                    position++;
+                    isValid = false;
+                }
+            }else{
+                position++;
+                isValid = false;
+            }
+        }else{
+            position++;
+            isValid = false;
+        }
+        return isValid + " " + position;
+    }
+
+    public String enter(String[] text, int position){
+        String currentData = text[position];
+        boolean isValid = true;
+        String complement = currentData.substring(currentData.indexOf("enter")+5, currentData.length());
+        if(complement.length() == 3){
+            if(complement.charAt(0) != '('){
+                isValid = false;
+            }
+            if(complement.charAt(1) != ')'){
+                isValid = false;
+            }
+            if(complement.charAt(2) != ';'){
+                isValid = false;
+            }
+        }else{
+            isValid = false;
+        }
+        position++;
+        return isValid + " " + position;
     }
 
     public String condition(String[] text, int position){
