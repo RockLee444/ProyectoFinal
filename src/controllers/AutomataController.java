@@ -191,7 +191,7 @@ public class AutomataController implements Initializable {
                     resultArray = result.split(" ");
                     isValid = Boolean.parseBoolean(resultArray[0]);
                     position = Integer.parseInt(resultArray[1]);
-                }else if(currentData[3].lastIndexOf(';') == currentData[3].length()-1){
+                }else if(currentData[3].lastIndexOf(';') == currentData[3].length()-1 && currentData[3].charAt(currentData[3].lastIndexOf(';')) - 1 != ' '){
                     String parameter = currentData[3].substring(0,currentData[3].lastIndexOf(';'));
                     String[] parameters = parameter.split("\\+");
                     for(int i = 0; i < parameters.length; i++){
@@ -225,14 +225,14 @@ public class AutomataController implements Initializable {
         String currentData = text[position];
         boolean isValid = true;
         String complement = currentData.substring(currentData.indexOf("enter")+5, currentData.length());
-        if(complement.length() == 3){
+        if(complement.length() >= 3){
             if(complement.charAt(0) != '('){
                 isValid = false;
             }
             if(complement.charAt(1) != ')'){
                 isValid = false;
             }
-            if(complement.charAt(2) != ';'){
+            if(complement.charAt(complement.length() - 1) != ';'){
                 isValid = false;
             }
         }else{
