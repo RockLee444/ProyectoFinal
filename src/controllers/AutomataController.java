@@ -191,7 +191,7 @@ public class AutomataController implements Initializable {
                     resultArray = result.split(" ");
                     isValid = Boolean.parseBoolean(resultArray[0]);
                     position = Integer.parseInt(resultArray[1]);
-                }else if(currentData[3].lastIndexOf(';') == currentData[3].length()-1 && currentData[3].charAt(currentData[3].lastIndexOf(';')) - 1 != ' '){
+                }else if(currentData[3].lastIndexOf(';') == currentData[3].length()-1){
                     String parameter = currentData[3].substring(0,currentData[3].lastIndexOf(';'));
                     String[] parameters = parameter.split("\\+");
                     for(int i = 0; i < parameters.length; i++){
