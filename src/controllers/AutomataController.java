@@ -357,6 +357,37 @@ public class AutomataController implements Initializable {
 
         //TODO Add fail
 
+        conditionPosition = text[position].indexOf("fail{");
+
+        position++;
+        boolean finishedIterating2 = false, hasContent2;
+        while (!finishedIterating2){
+            if(position < text.length) {
+                String[] finalPart = text[position].split("");
+                hasContent2 = true;
+                for (int i = 0; i < finalPart.length; i++) {
+                    if (finalPart[i].equals("}")) {
+                        hasContent2 = false;
+                        break;
+                    }
+                }
+                if (hasContent2) {
+                    String[] contentResult = contenido(text, position).split(" ");
+                    recursive = Boolean.parseBoolean(contentResult[0]);
+                    position = Integer.parseInt(contentResult[1]);
+                    if (!(isValid && recursive)) {
+                        isValid = false;
+                    }
+                } else {
+                    finishedIterating2 = true;
+                }
+            } else {
+                finishedIterating2 = true;
+                position--;
+            }
+        }
+
+        position++;
         result = isValid + " " + position;
         return result;
     }
@@ -439,9 +470,16 @@ public class AutomataController implements Initializable {
         boolean isValid = true, recursive = false;
 
         if(currentData.contains("data")){
-
+            result = data(text, position);
+            String[] resultArray = result.split(" ");
+            recursive = Boolean.parseBoolean(resultArray[0]);
+            position = Integer.parseInt(resultArray[1]);
         } else if(currentData.contains("enter")){
             //result = enter();
+            result = enter(text, position);
+            String[] resultArray = result.split(" ");
+            recursive = Boolean.parseBoolean(resultArray[0]);
+            position = Integer.parseInt(resultArray[1]);
         } else if(currentData.contains("condition")){
             result = condition(text, position);
             String[] resultArray = result.split(" ");
