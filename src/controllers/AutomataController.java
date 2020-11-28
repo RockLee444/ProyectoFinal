@@ -228,14 +228,14 @@ public class AutomataController implements Initializable {
         String currentData = text[position];
         boolean isValid = true;
         String complement = currentData.substring(currentData.indexOf("enter")+5, currentData.length());
-        if(complement.length() == 3){
+        if(complement.length() >= 3){
             if(complement.charAt(0) != '('){
                 isValid = false;
             }
             if(complement.charAt(1) != ')'){
                 isValid = false;
             }
-            if(complement.charAt(2) != ';'){
+            if(complement.charAt(complement.length() - 1) != ';'){
                 isValid = false;
             }
         }else{
