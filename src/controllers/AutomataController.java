@@ -635,14 +635,19 @@ public class AutomataController implements Initializable {
             String[] resultArray = result.split(" ");
             recursive = Boolean.parseBoolean(resultArray[0]);
             position = Integer.parseInt(resultArray[1]);
-        } else if(currentData.contains("enter")){
-            //result = enter();
-            result = enter(text, position);
+        } else if(currentData.contains("condition")){
+            result = condition(text, position);
             String[] resultArray = result.split(" ");
             recursive = Boolean.parseBoolean(resultArray[0]);
             position = Integer.parseInt(resultArray[1]);
-        } else if(currentData.contains("condition")){
-            result = condition(text, position);
+        } else if(currentData.contains("=")){
+            result = assignation(text, position);
+            String[] resultArray = result.split(" ");
+            recursive = Boolean.parseBoolean(resultArray[0]);
+            position = Integer.parseInt(resultArray[1]);
+        } else if(currentData.contains("enter")){
+            //result = enter();
+            result = enter(text, position);
             String[] resultArray = result.split(" ");
             recursive = Boolean.parseBoolean(resultArray[0]);
             position = Integer.parseInt(resultArray[1]);
