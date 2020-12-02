@@ -432,6 +432,10 @@ public class AutomataController implements Initializable {
                     if(isValid){
                         int j=0;
                         String[] conditions = text[position].substring(conditionPosition + wordLength).split(" ");
+                        System.out.println("LENGTH: " + conditions.length);
+                        if(conditions.length < 3){
+                            isValid = false;
+                        }
                         while(!finished){
                             if(j + 3 < conditions.length && !(conditions[j].isBlank() || conditions[j].isEmpty())){
                                 if(iteration == 0) {
