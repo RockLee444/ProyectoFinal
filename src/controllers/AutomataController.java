@@ -114,7 +114,10 @@ public class AutomataController implements Initializable {
                 recursive = Boolean.parseBoolean(resultArray[0]);
                 position = Integer.parseInt(resultArray[1]) - 1;
             } else if(currentData.contains("ignore")){
-
+                result = ignore(text,position);
+                resultArray = result.split(" ");
+                recursive = Boolean.parseBoolean(resultArray[0]);
+                position = Integer.parseInt(resultArray[1])-1;
             } else if(currentData.contains("output")){
                 result = output(text, position);
                 resultArray = result.split(" ");
@@ -329,6 +332,72 @@ public class AutomataController implements Initializable {
             }
         }else{
             isValid = false;
+        }
+        position++;
+        return isValid + " " + position;
+    }
+
+    public String ignore(String[] text, int position){
+        String currentData = text[position];
+        boolean isValid = true, finished = false;
+        int outputPosition = 0, iteration = 0, wordLength = 7;
+        while(!finished){
+            for(int i=0;i<2;i++){
+                switch (i){
+                    case 0:
+                        outputPosition = text[position].indexOf("ignore(");
+                        if(outputPosition >= 0) {
+                            for (int x = 0; x < outputPosition; x++) {
+                                String currentValue = "" + text[position].charAt(x);
+                                if (!(currentValue.isEmpty() || currentValue.isBlank())) {
+                                    isValid = false;
+                                }
+                            }
+                            if (!text[position].substring(outputPosition, outputPosition + wordLength).equals("ignore(")) {
+                                isValid = false;
+                            }
+                        } else {
+                            isValid = false;
+                        }
+                        break;
+
+                    case 1:
+                        if(isValid){
+                            int j=0;
+                            String[] outputs = text[position].substring(outputPosition + wordLength).split(" ");
+                            while(!finished){
+                                if(j + 2 < outputs.length && !(outputs[j].isBlank() || outputs[j].isEmpty())){
+                                    if(iteration == 0) {
+                                        Pattern identifier = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$|([\\\"][\\w|\\W]*[\\\"])$");
+                                        Matcher verified = identifier.matcher(outputs[j]);
+                                        if (verified.find()) {
+                                            iteration++;
+                                        } else {
+                                            isValid = false;
+                                        }
+                                        j++;
+                                    }
+                                } else if(outputs[j].isBlank() || outputs[j].isEmpty()){
+                                    j++;
+                                } else {
+                                    finished = true;
+                                }
+                            }
+                            if(outputs[j].equals(")")){
+                                j++;
+                                if(!outputs[j].equals(";")){
+                                    isValid = false;
+                                }
+                            } else {
+                                isValid = false;
+                            }
+                        }
+                        break;
+                }
+            }
+            if(!isValid){
+                finished = true;
+            }
         }
         position++;
         return isValid + " " + position;
@@ -578,7 +647,10 @@ public class AutomataController implements Initializable {
             recursive = Boolean.parseBoolean(resultArray[0]);
             position = Integer.parseInt(resultArray[1]);
         } else if(currentData.contains("ignore")){
-
+            result = ignore(text,position);
+            String[] resultArray = result.split(" ");
+            recursive = Boolean.parseBoolean(resultArray[0]);
+            position = Integer.parseInt(resultArray[1]);
         } else if(currentData.contains("output")){
             result = output(text, position);
             String[] resultArray = result.split(" ");
