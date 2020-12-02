@@ -521,34 +521,35 @@ public class AutomataController implements Initializable {
         position++;
 
         //TODO Add fail
+        if(position < text.length){
+            conditionPosition = text[position].indexOf("fail{");
 
-        conditionPosition = text[position].indexOf("fail{");
-
-        position++;
-        boolean finishedIterating2 = false, hasContent2;
-        while (!finishedIterating2){
-            if(position < text.length) {
-                String[] finalPart = text[position].split("");
-                hasContent2 = true;
-                for (int i = 0; i < finalPart.length; i++) {
-                    if (finalPart[i].equals("}")) {
-                        hasContent2 = false;
-                        break;
+            position++;
+            boolean finishedIterating2 = false, hasContent2;
+            while (!finishedIterating2){
+                if(position < text.length) {
+                    String[] finalPart = text[position].split("");
+                    hasContent2 = true;
+                    for (int i = 0; i < finalPart.length; i++) {
+                        if (finalPart[i].equals("}")) {
+                            hasContent2 = false;
+                            break;
+                        }
                     }
-                }
-                if (hasContent2) {
-                    String[] contentResult = contenido(text, position).split(" ");
-                    recursive = Boolean.parseBoolean(contentResult[0]);
-                    position = Integer.parseInt(contentResult[1]);
-                    if (!(isValid && recursive)) {
-                        isValid = false;
+                    if (hasContent2) {
+                        String[] contentResult = contenido(text, position).split(" ");
+                        recursive = Boolean.parseBoolean(contentResult[0]);
+                        position = Integer.parseInt(contentResult[1]);
+                        if (!(isValid && recursive)) {
+                            isValid = false;
+                        }
+                    } else {
+                        finishedIterating2 = true;
                     }
                 } else {
                     finishedIterating2 = true;
+                    position--;
                 }
-            } else {
-                finishedIterating2 = true;
-                position--;
             }
         }
 
