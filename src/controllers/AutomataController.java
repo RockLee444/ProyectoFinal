@@ -365,6 +365,9 @@ public class AutomataController implements Initializable {
                         if(isValid){
                             int j=0;
                             String[] outputs = text[position].substring(outputPosition + wordLength).split(" ");
+                            if(outputs.length < 3){
+                                isValid = false;
+                            }
                             while(!finished){
                                 if(j + 2 < outputs.length && !(outputs[j].isBlank() || outputs[j].isEmpty())){
                                     if(iteration == 0) {
