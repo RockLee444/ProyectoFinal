@@ -97,14 +97,19 @@ public class AutomataController implements Initializable {
                 resultArray = result.split(" ");
                 recursive = Boolean.parseBoolean(resultArray[0]);
                 position = Integer.parseInt(resultArray[1]) - 1;
-            } else if(currentData.contains("enter")){
-                //result = enter();
-                result = enter(text, position);
+            } else if(currentData.contains("condition")){
+                result = condition(text, position);
                 resultArray = result.split(" ");
                 recursive = Boolean.parseBoolean(resultArray[0]);
                 position = Integer.parseInt(resultArray[1]) - 1;
-            } else if(currentData.contains("condition")){
-                result = condition(text, position);
+            } else if(currentData.contains("=")){
+                result = assignation(text, position);
+                resultArray = result.split(" ");
+                recursive = Boolean.parseBoolean(resultArray[0]);
+                position = Integer.parseInt(resultArray[1]) - 1;
+            } else if(currentData.contains("enter")){
+                //result = enter();
+                result = enter(text, position);
                 resultArray = result.split(" ");
                 recursive = Boolean.parseBoolean(resultArray[0]);
                 position = Integer.parseInt(resultArray[1]) - 1;
@@ -143,6 +148,89 @@ public class AutomataController implements Initializable {
         return isValid;
     }
 
+    public String assignation(String[] text, int position){
+        boolean isValid = true, finished = false;
+        String identifier="";
+        Pattern patternId;
+        Matcher verified;
+        String result;
+        String[] resultArray;
+        String txt="";
+        int auxP=0;
+        String currentData[]  = text[position].split(" ");
+        for(int i=0; i<currentData.length - 1; i++){
+            if(!currentData[i].isBlank() && txt.isBlank()){
+                txt += currentData[i] + " ";
+                auxP = i;
+                i=currentData.length;
+            }
+        }
+        for(int i=auxP+1; i<currentData.length - 1; i++){
+            if (currentData[i].isBlank()){
+                txt+=" ";
+            }
+            txt += currentData[i] + " ";
+        }
+        txt += currentData[currentData.length - 1];
+        currentData  = txt.split(" ");
+
+        if(currentData.length >= 4){
+            if(currentData.length == 4 && currentData[3].equals(";") && currentData[1].equals("=")){
+                patternId = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
+                verified = patternId.matcher(currentData[0]);
+                if(!verified.find()){
+                    isValid = false;
+                }
+                if(currentData[2].equals("enter()")){
+                    result = enter(text, position);
+                    resultArray = result.split(" ");
+                    isValid = Boolean.parseBoolean(resultArray[0]);
+                    position = Integer.parseInt(resultArray[1]) - 1;
+                } else {
+                    identifier = currentData[2];
+                    if (currentData[2].charAt(0) == '"' && currentData[2].charAt(currentData[2].length() - 1) == '"'){
+                        identifier = currentData[2].substring(1,currentData[2].length() - 1);
+                        System.out.println(identifier);
+                        patternId = Pattern.compile("([\\w])$");
+                    }
+                    verified = patternId.matcher(identifier);
+                    if(!verified.find()){
+                        isValid = false;
+                    }
+                }
+                position++;
+            } else if(currentData[currentData.length - 1].equals(";") && !currentData[1].isBlank()){
+                txt = text[position];
+                String strIdentifiers = txt.substring(txt.indexOf("=") + 2, txt.indexOf(";") + 1);
+                String identifiers[] = strIdentifiers.split(" ");
+                patternId = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
+                for(int i=0; i<identifiers.length; i++){
+                    identifier = identifiers[i];
+                    if (!identifiers[i].equals("+") && !identifiers[i].isBlank() && !identifiers[i].equals(";")){
+                        if (identifiers[i].charAt(0) == '"' && identifiers[i].charAt(identifiers[i].length() - 1) == '"'){
+                            identifier = identifiers[i].substring(1,identifiers[i].length() - 1);
+                            patternId = Pattern.compile("([\\w])$");
+                        }
+                        verified = patternId.matcher(identifier);
+                        if(!verified.find()){
+                            isValid = false;
+                        }
+                    } else if(identifiers[i].isBlank()){
+                        isValid = false;
+                    }
+                }
+                position++;
+            } else {
+                position++;
+                isValid = false;
+            }
+        }else{
+            position++;
+            isValid = false;
+        }
+        return isValid + " " + position;
+    }
+
     public String data(String[] text, int position){
         String result;
         String[] resultArray;
@@ -160,11 +248,15 @@ public class AutomataController implements Initializable {
             }
             currentData = txt.split(" ");
         }
-        if (currentData.length>4){
+        if (currentData.length>4 && currentData[0].equals("data") && currentData[2].equals("=")){
             txt = currentData[0]+" "+currentData[1]+" "+currentData[2]+" ";
             for (int i=3; i<currentData.length;i++){
                 txt += currentData[i];
             }
+            currentData = txt.split(" ");
+        }
+        if (currentData.length>2){
+            txt = currentData[0]+" "+currentData[1]+";";
             currentData = txt.split(" ");
         }
         boolean isValid = true, finished = false;
@@ -543,14 +635,19 @@ public class AutomataController implements Initializable {
             String[] resultArray = result.split(" ");
             recursive = Boolean.parseBoolean(resultArray[0]);
             position = Integer.parseInt(resultArray[1]);
-        } else if(currentData.contains("enter")){
-            //result = enter();
-            result = enter(text, position);
+        } else if(currentData.contains("condition")){
+            result = condition(text, position);
             String[] resultArray = result.split(" ");
             recursive = Boolean.parseBoolean(resultArray[0]);
             position = Integer.parseInt(resultArray[1]);
-        } else if(currentData.contains("condition")){
-            result = condition(text, position);
+        } else if(currentData.contains("=")){
+            result = assignation(text, position);
+            String[] resultArray = result.split(" ");
+            recursive = Boolean.parseBoolean(resultArray[0]);
+            position = Integer.parseInt(resultArray[1]);
+        } else if(currentData.contains("enter")){
+            //result = enter();
+            result = enter(text, position);
             String[] resultArray = result.split(" ");
             recursive = Boolean.parseBoolean(resultArray[0]);
             position = Integer.parseInt(resultArray[1]);
