@@ -640,28 +640,29 @@ public class AutomataController implements Initializable {
                                 finished = true;
                             }
                         }
-                        if(j +1 < conditions.length) {
-                            if (conditions[j].equals(")")) {
-                                j++;
-                                if (!conditions[j].equals("{")) {
-                                    lineError=position+1;
-                                    mensajeError = mensajeError+"\nError Condition No.11 Linea: "+lineError;
-                                    System.out.println("Error Condition No.11 Linea: "+lineError);
+                        if(conditions != null) {
+                            if (j + 1 < conditions.length) {
+                                if (conditions[j].equals(")")) {
+                                    j++;
+                                    if (!conditions[j].equals("{")) {
+                                        lineError = position + 1;
+                                        mensajeError = mensajeError + "\nError Condition No.11 Linea: " + lineError;
+                                        System.out.println("Error Condition No.11 Linea: " + lineError);
+                                        isValid = false;
+                                    }
+                                } else {
+                                    lineError = position + 1;
+                                    mensajeError = mensajeError + "\nError Condition No.12 Linea: " + lineError;
+                                    System.out.println("Error Condition No.12 Linea: " + lineError);
                                     isValid = false;
                                 }
                             } else {
-                                lineError=position+1;
-                                mensajeError = mensajeError+"\nError Condition No.12 Linea: "+lineError;
-                                System.out.println("Error Condition No.12 Linea: "+lineError);
+                                lineError = position + 1;
+                                mensajeError = mensajeError + "\nError Condition No.13 Linea: " + lineError;
+                                System.out.println("Error Condition No.13 Linea: " + lineError);
                                 isValid = false;
                             }
-                        } else {
-                            lineError=position+1;
-                            mensajeError = mensajeError+"\nError Condition No.13 Linea: "+lineError;
-                            System.out.println("Error Condition No.13 Linea: "+lineError);
-                            isValid =false;
                         }
-
                     }
                 break;
             }
