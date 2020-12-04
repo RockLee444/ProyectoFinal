@@ -65,7 +65,6 @@ public class AutomataController implements Initializable {
     public void verifyInput(String input){
         //TODO
         boolean finished = false, error = false;
-        int position = 0;
         currentState = "q0";
         String[] inputArray = input.split("\n");
 
@@ -82,11 +81,27 @@ public class AutomataController implements Initializable {
 
     public boolean principal(String[] text){
         boolean isValid = true, recursive = false;
-        int position = 1, newPosition = 0;
+        int position = 0, wordLength = 10;
 
-        if(!text[0].equals("program(){")){
+        int programPosition = text[position].indexOf("program(){");
+        if(programPosition >= 0){
+            for(int i=0;i<programPosition;i++){
+                String currentValue = "" + text[position].charAt(i);
+                if (!(currentValue.isEmpty() || currentValue.isBlank())) {
+                    isValid = false;
+                }
+            }
+            if(programPosition + wordLength <= text[position].length()) {
+                if (!text[position].substring(programPosition, programPosition + wordLength).equals("program(){")) {
+                    isValid = false;
+                }
+            } else {
+                isValid = false;
+            }
+        } else {
             isValid = false;
         }
+        position++;
 
         while(position < text.length -1){
             String currentData = text[position], result = "";
@@ -135,14 +150,25 @@ public class AutomataController implements Initializable {
             }
         }
 
+        int closingSymbols = 0;
+
         if(position < text.length) {
-            if (!text[position].equals("}") || !(isValid && recursive)) {
-                isValid = false;
+            String[] lastLine = text[position].split("");
+            for(int i = 0; i<lastLine.length ;i++) {
+                if (!lastLine[i].equals("}") || !(isValid && recursive)) {
+                    if(!(lastLine[i].isBlank() || lastLine[i].isEmpty())){
+                        isValid = false;
+                    }
+                } else {
+                    closingSymbols++;
+                }
             }
         } else {
-            if(!(isValid && recursive)){
-                isValid = false;
-            }
+            isValid = false;
+        }
+
+        if(closingSymbols > 1){
+            isValid = false;
         }
 
         return isValid;
@@ -190,7 +216,6 @@ public class AutomataController implements Initializable {
                     identifier = currentData[2];
                     if (currentData[2].charAt(0) == '"' && currentData[2].charAt(currentData[2].length() - 1) == '"'){
                         identifier = currentData[2].substring(1,currentData[2].length() - 1);
-                        System.out.println(identifier);
                         patternId = Pattern.compile("([\\w])$");
                     }
                     verified = patternId.matcher(identifier);
@@ -423,7 +448,12 @@ public class AutomataController implements Initializable {
                                 isValid = false;
                             }
                         }
-                        if (!text[position].substring(conditionPosition, conditionPosition + wordLength).equals("condition(")) {
+
+                        if(conditionPosition + wordLength <= text[position].length()) {
+                            if (!text[position].substring(conditionPosition, conditionPosition + wordLength).equals("condition(")) {
+                                isValid = false;
+                            }
+                        } else {
                             isValid = false;
                         }
                     }  else {
@@ -434,12 +464,16 @@ public class AutomataController implements Initializable {
                 case 1:
                     if(isValid){
                         int j=0;
-                        String[] conditions = text[position].substring(conditionPosition + wordLength).split(" ");
-                        System.out.println("LENGTH: " + conditions.length);
-                        if(conditions.length < 3){
+                        String[] conditions = null;
+                        if(conditionPosition + wordLength < text[position].length()) {
+                            conditions = text[position].substring(conditionPosition + wordLength).split(" ");
+                            if (conditions.length < 3) {
+                                isValid = false;
+                            }
+                        } else {
                             isValid = false;
                         }
-                        while(!finished){
+                        while(!finished && isValid){
                             if(j + 3 < conditions.length && !(conditions[j].isBlank() || conditions[j].isEmpty())){
                                 if(iteration == 0) {
                                     Pattern identifier = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
@@ -474,14 +508,19 @@ public class AutomataController implements Initializable {
                                 finished = true;
                             }
                         }
-                        if(conditions[j].equals(")")){
-                            j++;
-                            if(!conditions[j].equals("{")) {
+                        if(j +1 < conditions.length) {
+                            if (conditions[j].equals(")")) {
+                                j++;
+                                if (!conditions[j].equals("{")) {
+                                    isValid = false;
+                                }
+                            } else {
                                 isValid = false;
                             }
                         } else {
-                            isValid = false;
+                            isValid =false;
                         }
+
                     }
                 break;
             }
@@ -492,17 +531,32 @@ public class AutomataController implements Initializable {
         position++;
 
         String currentData = text[position];
-        int finalPartIterator = 0;
+        int counter = 0, closingSymbols = 0;
         boolean finishedIterating = false, hasContent = false;
 
         while(!finishedIterating){
+            counter = 0;
+            closingSymbols = 0;
             if(position < text.length) {
                 String[] finalPart = text[position].split("");
                 hasContent = true;
-                for (int i = 0; i < finalPart.length; i++) {
-                    if (finalPart[i].equals("}")) {
+                if( !(text[position].isBlank() || text[position].isEmpty()) ) {
+                    for (int i = 0; i < finalPart.length; i++) {
+                        if (!finalPart[i].equals("}")){
+                            if (!(finalPart[i].isEmpty() || finalPart[i].isBlank())) {
+                                counter++;
+                                break;
+                            }
+                        } else {
+                            closingSymbols++;
+                        }
+                    }
+                    if (counter == 0) {
                         hasContent = false;
-                        break;
+                    }
+
+                    if(closingSymbols > 1){
+                        isValid = false;
                     }
                 }
                 if (hasContent) {
@@ -524,35 +578,54 @@ public class AutomataController implements Initializable {
         position++;
 
         //TODO Add fail
+
         if(position < text.length){
             conditionPosition = text[position].indexOf("fail{");
+            if(conditionPosition >= 0) {
+                position++;
+                boolean finishedIterating2 = false, hasContent2;
+                while (!finishedIterating2) {
+                    closingSymbols = 0;
+                    if (position < text.length) {
+                        String[] finalPart = text[position].split("");
+                        hasContent2 = true;
+                        counter = 0;
+                        //TODO AQUI
+                        if( !(text[position].isBlank() || text[position].isEmpty()) ) {
+                            for (int i = 0; i < finalPart.length; i++) {
+                                if ((!finalPart[i].equals("}"))) {
+                                    if (!(finalPart[i].isEmpty() || finalPart[i].isBlank())) {
+                                        counter++;
+                                    }
+                                } else {
+                                    closingSymbols++;
+                                }
+                            }
+                            if (counter == 0) {
+                                hasContent2 = false;
+                            }
 
-            position++;
-            boolean finishedIterating2 = false, hasContent2;
-            while (!finishedIterating2){
-                if(position < text.length) {
-                    String[] finalPart = text[position].split("");
-                    hasContent2 = true;
-                    for (int i = 0; i < finalPart.length; i++) {
-                        if (finalPart[i].equals("}")) {
-                            hasContent2 = false;
-                            break;
+                            if(closingSymbols > 1){
+                                isValid = false;
+                            }
                         }
-                    }
-                    if (hasContent2) {
-                        String[] contentResult = contenido(text, position).split(" ");
-                        recursive = Boolean.parseBoolean(contentResult[0]);
-                        position = Integer.parseInt(contentResult[1]);
-                        if (!(isValid && recursive)) {
-                            isValid = false;
+                        if (hasContent2) {
+                            String[] contentResult = contenido(text, position).split(" ");
+                            recursive = Boolean.parseBoolean(contentResult[0]);
+                            position = Integer.parseInt(contentResult[1]);
+                            if (!(isValid && recursive)) {
+                                isValid = false;
+                            }
+                        } else {
+                            finishedIterating2 = true;
                         }
                     } else {
                         finishedIterating2 = true;
+                        position--;
                     }
-                } else {
-                    finishedIterating2 = true;
-                    position--;
                 }
+            } else {
+                position--;
             }
         }
 
@@ -577,7 +650,11 @@ public class AutomataController implements Initializable {
                                     isValid = false;
                                 }
                             }
-                            if (!text[position].substring(outputPosition, outputPosition + wordLength).equals("output(")) {
+                            if(outputPosition + wordLength < text[position].length()) {
+                                if (!text[position].substring(outputPosition, outputPosition + wordLength).equals("output(")) {
+                                    isValid = false;
+                                }
+                            } else {
                                 isValid = false;
                             }
                         } else {
