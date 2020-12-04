@@ -75,7 +75,7 @@ public class AutomataController implements Initializable {
         }
 
         if(!error){
-            showAlert("HECHO", "Todo salió bien :)",AlertType.CONFIRMATION);
+            showAlert("HECHO", "Ejecución exitosa",AlertType.CONFIRMATION);
         } else {
             showAlert("ERROR", "Hay un error! En la linea: "+"\n"+mensajeError,AlertType.ERROR);
             mensajeError = " ";
