@@ -27,8 +27,8 @@ public class AutomataController implements Initializable {
 
     private HashMap<String, String> wordsMap;
     private HashMap<String,String> conditionSymbolsMap;
-
     private String currentState;
+    private int lineaError;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -64,8 +64,7 @@ public class AutomataController implements Initializable {
 
     public void verifyInput(String input){
         //TODO
-        boolean finished = false, error = false;
-        int position = 0;
+        boolean error = false;
         currentState = "q0";
         String[] inputArray = input.split("\n");
 
@@ -76,13 +75,13 @@ public class AutomataController implements Initializable {
         if(!error){
             showAlert("HECHO", "Todo salió bien :)",AlertType.CONFIRMATION);
         } else {
-            showAlert("ERROR", "Hay un error!",AlertType.ERROR);
+            showAlert("ERROR", "Hay un error! En la linea: "+lineaError,AlertType.ERROR);
         }
     }
 
     public boolean principal(String[] text){
         boolean isValid = true, recursive = false;
-        int position = 1, newPosition = 0;
+        int position = 1;
 
         if(!text[0].equals("program(){")){
             isValid = false;
@@ -179,6 +178,7 @@ public class AutomataController implements Initializable {
                 patternId = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
                 verified = patternId.matcher(currentData[0]);
                 if(!verified.find()){
+                    lineaError = position+1;
                     isValid = false;
                 }
                 if(currentData[2].equals("enter()")){
@@ -195,6 +195,7 @@ public class AutomataController implements Initializable {
                     }
                     verified = patternId.matcher(identifier);
                     if(!verified.find()){
+                        lineaError = position+1;
                         isValid = false;
                     }
                 }
@@ -213,18 +214,22 @@ public class AutomataController implements Initializable {
                         }
                         verified = patternId.matcher(identifier);
                         if(!verified.find()){
+                            lineaError = position+1;
                             isValid = false;
                         }
                     } else if(identifiers[i].isBlank()){
+                        lineaError = position+1;
                         isValid = false;
                     }
                 }
                 position++;
             } else {
+                lineaError = position+1;
                 position++;
                 isValid = false;
             }
         }else{
+            lineaError = position+1;
             position++;
             isValid = false;
         }
@@ -266,9 +271,11 @@ public class AutomataController implements Initializable {
                 patternId = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
                 verified = patternId.matcher(identifier);
                 if (!verified.find()){
+                    lineaError = position+1;
                     isValid = false;
                 }
                 if(currentData[1].lastIndexOf(';') != currentData[1].length() - 1 ){
+                    lineaError = position+1;
                     isValid = false;
                 }
                 position++;
@@ -276,9 +283,11 @@ public class AutomataController implements Initializable {
                 patternId = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
                 verified = patternId.matcher(currentData[1]);
                 if(!verified.find()){
+                    lineaError = position+1;
                     isValid = false;
                 }
                 if(!currentData[2].equals("=")){
+                    lineaError = position+1;
                     isValid = false;
                 }
                 if(currentData[3].indexOf("enter") > -1){
@@ -297,19 +306,23 @@ public class AutomataController implements Initializable {
                         }
                         verified = patternId.matcher(parameters[i]);
                         if(!verified.find()){
+                            lineaError = position+1;
                             isValid = false;
                         }
                     }
                     position++;
                 }else{
+                    lineaError = position+1;
                     position++;
                     isValid = false;
                 }
             }else{
+                lineaError = position+1;
                 position++;
                 isValid = false;
             }
         }else{
+            lineaError = position+1;
             position++;
             isValid = false;
         }
@@ -322,15 +335,19 @@ public class AutomataController implements Initializable {
         String complement = currentData.substring(currentData.indexOf("enter")+5, currentData.length());
         if(complement.length() >= 3){
             if(complement.charAt(0) != '('){
+                lineaError = position+1;
                 isValid = false;
             }
             if(complement.charAt(1) != ')'){
+                lineaError = position+1;
                 isValid = false;
             }
             if(complement.charAt(complement.length() - 1) != ';'){
+                lineaError = position+1;
                 isValid = false;
             }
         }else{
+            lineaError = position+1;
             isValid = false;
         }
         position++;
@@ -350,13 +367,16 @@ public class AutomataController implements Initializable {
                             for (int x = 0; x < outputPosition; x++) {
                                 String currentValue = "" + text[position].charAt(x);
                                 if (!(currentValue.isEmpty() || currentValue.isBlank())) {
+                                    lineaError = position+1;
                                     isValid = false;
                                 }
                             }
                             if (!text[position].substring(outputPosition, outputPosition + wordLength).equals("ignore(")) {
+                                lineaError = position+1;
                                 isValid = false;
                             }
                         } else {
+                            lineaError = position+1;
                             isValid = false;
                         }
                         break;
@@ -366,6 +386,7 @@ public class AutomataController implements Initializable {
                             int j=0;
                             String[] outputs = text[position].substring(outputPosition + wordLength).split(" ");
                             if(outputs.length < 3){
+                                lineaError = position+1;
                                 isValid = false;
                             }
                             while(!finished){
@@ -376,6 +397,7 @@ public class AutomataController implements Initializable {
                                         if (verified.find()) {
                                             iteration++;
                                         } else {
+                                            lineaError = position+1;
                                             isValid = false;
                                         }
                                         j++;
@@ -389,9 +411,11 @@ public class AutomataController implements Initializable {
                             if(outputs[j].equals(")")){
                                 j++;
                                 if(!outputs[j].equals(";")){
+                                    lineaError = position+1;
                                     isValid = false;
                                 }
                             } else {
+                                lineaError = position+1;
                                 isValid = false;
                             }
                         }
@@ -420,13 +444,16 @@ public class AutomataController implements Initializable {
                         for (int x = 0; x < conditionPosition; x++) {
                             String currentValue = "" + text[position].charAt(x);
                             if (!(currentValue.isEmpty() || currentValue.isBlank())) {
+                                lineaError = position+1;
                                 isValid = false;
                             }
                         }
                         if (!text[position].substring(conditionPosition, conditionPosition + wordLength).equals("condition(")) {
+                            lineaError = position+1;
                             isValid = false;
                         }
                     }  else {
+                        lineaError = position+1;
                         isValid = false;
                     }
                 break;
@@ -437,6 +464,7 @@ public class AutomataController implements Initializable {
                         String[] conditions = text[position].substring(conditionPosition + wordLength).split(" ");
                         System.out.println("LENGTH: " + conditions.length);
                         if(conditions.length < 3){
+                            lineaError = position+1;
                             isValid = false;
                         }
                         while(!finished){
@@ -450,19 +478,23 @@ public class AutomataController implements Initializable {
                                             j++;
                                             verified = identifier.matcher(conditions[j]);
                                             if (!verified.find()) {
+                                                lineaError = position+1;
                                                 isValid = false;
                                             }
                                             iteration++;
                                         } else {
+                                            lineaError = position+1;
                                             isValid = false;
                                         }
 
                                     } else {
+                                        lineaError = position+1;
                                         isValid = false;
                                     }
                                     j++;
                                 } else {
                                     if( !(conditions[j].equals("||") || conditions[j].equals("&&")) ){
+                                        lineaError = position+1;
                                         isValid = false;
                                     }
                                     iteration = 0;
@@ -477,9 +509,11 @@ public class AutomataController implements Initializable {
                         if(conditions[j].equals(")")){
                             j++;
                             if(!conditions[j].equals("{")) {
+                                lineaError = position+1;
                                 isValid = false;
                             }
                         } else {
+                            lineaError = position+1;
                             isValid = false;
                         }
                     }
@@ -544,6 +578,7 @@ public class AutomataController implements Initializable {
                         recursive = Boolean.parseBoolean(contentResult[0]);
                         position = Integer.parseInt(contentResult[1]);
                         if (!(isValid && recursive)) {
+                            lineaError = position+1;
                             isValid = false;
                         }
                     } else {
@@ -574,13 +609,16 @@ public class AutomataController implements Initializable {
                             for (int x = 0; x < outputPosition; x++) {
                                 String currentValue = "" + text[position].charAt(x);
                                 if (!(currentValue.isEmpty() || currentValue.isBlank())) {
+                                    lineaError = position+1;
                                     isValid = false;
                                 }
                             }
                             if (!text[position].substring(outputPosition, outputPosition + wordLength).equals("output(")) {
+                                lineaError = position+1;
                                 isValid = false;
                             }
                         } else {
+                            lineaError = position+1;
                             isValid = false;
                         }
                     break;
@@ -597,11 +635,13 @@ public class AutomataController implements Initializable {
                                         if (verified.find()) {
                                             iteration++;
                                         } else {
+                                            lineaError = position+1;
                                             isValid = false;
                                         }
                                         j++;
                                     } else {
                                         if( !(outputs[j].equals("+")) ){
+                                            lineaError = position+1;
                                             isValid = false;
                                         }
                                         iteration = 0;
@@ -616,9 +656,11 @@ public class AutomataController implements Initializable {
                             if(outputs[j].equals(")")){
                                 j++;
                                 if(!outputs[j].equals(";")){
+                                    lineaError = position+1;
                                     isValid = false;
                                 }
                             } else {
+                                lineaError = position+1;
                                 isValid = false;
                             }
                         }
@@ -678,6 +720,7 @@ public class AutomataController implements Initializable {
         }
 
         if(!(isValid && recursive)){
+            lineaError = position+1;
             isValid = false;
         }
 
