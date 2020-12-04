@@ -29,6 +29,8 @@ public class AutomataController implements Initializable {
     private HashMap<String,String> conditionSymbolsMap;
 
     private String currentState;
+    private int lineError = 0;
+    private String mensajeError = " ";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -75,7 +77,8 @@ public class AutomataController implements Initializable {
         if(!error){
             showAlert("HECHO", "Todo salió bien :)",AlertType.CONFIRMATION);
         } else {
-            showAlert("ERROR", "Hay un error!",AlertType.ERROR);
+            showAlert("ERROR", "Hay un error! En la linea: "+"\n"+mensajeError,AlertType.ERROR);
+            mensajeError = " ";
         }
     }
 
@@ -88,17 +91,29 @@ public class AutomataController implements Initializable {
             for(int i=0;i<programPosition;i++){
                 String currentValue = "" + text[position].charAt(i);
                 if (!(currentValue.isEmpty() || currentValue.isBlank())) {
+                    lineError=position+1;
+                    mensajeError = mensajeError+"\nError Principal No.1 Linea: "+lineError;
+                    System.out.println("Error Principal No.1 Linea: "+lineError);
                     isValid = false;
                 }
             }
             if(programPosition + wordLength <= text[position].length()) {
                 if (!text[position].substring(programPosition, programPosition + wordLength).equals("program(){")) {
+                    lineError=position+1;
+                    mensajeError = mensajeError+"\nError Principal No.2 Linea: "+lineError;
+                    System.out.println("Error Principal No.2 Linea: "+lineError);
                     isValid = false;
                 }
             } else {
+                lineError=position+1;
+                mensajeError = mensajeError+"\nError Principal No.3 Linea: "+lineError;
+                System.out.println("Error Principal No.3 Linea: "+lineError);
                 isValid = false;
             }
         } else {
+            lineError=position+1;
+            mensajeError = mensajeError+"\nError Principal No.4 Linea: "+lineError;
+            System.out.println("Error Principal No.4 Linea: "+lineError);
             isValid = false;
         }
         position++;
@@ -141,6 +156,9 @@ public class AutomataController implements Initializable {
             } else if(currentData.isEmpty() || currentData.isBlank()){
                 recursive = true;
             } else {
+                lineError=position+1;
+                mensajeError = mensajeError+"\nError Principal No.5 Linea: "+lineError;
+                System.out.println("Error Principal No.5 Linea: "+lineError);
                 isValid = false;
             }
             position++;
@@ -157,6 +175,9 @@ public class AutomataController implements Initializable {
             for(int i = 0; i<lastLine.length ;i++) {
                 if (!lastLine[i].equals("}") || !(isValid && recursive)) {
                     if(!(lastLine[i].isBlank() || lastLine[i].isEmpty())){
+                        lineError=position+1;
+                        mensajeError = mensajeError+"\nError Principal No.6 Linea: "+lineError;
+                        System.out.println("Error Principal No.6 Linea: "+lineError);
                         isValid = false;
                     }
                 } else {
@@ -164,10 +185,16 @@ public class AutomataController implements Initializable {
                 }
             }
         } else {
+            lineError=position+1;
+            mensajeError = mensajeError+"\nError Principal No.7 Linea: "+lineError;
+            System.out.println("Error Principal No.7 Linea: "+lineError);
             isValid = false;
         }
 
         if(closingSymbols > 1){
+            lineError=position+1;
+            mensajeError = mensajeError+"\nError Principal No.8 Linea: "+lineError;
+            System.out.println("Error Principal No.8 Linea: "+lineError);
             isValid = false;
         }
 
@@ -205,6 +232,9 @@ public class AutomataController implements Initializable {
                 patternId = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
                 verified = patternId.matcher(currentData[0]);
                 if(!verified.find()){
+                    lineError=position+1;
+                    mensajeError = mensajeError+"\nError Assignation No.1 Linea: "+lineError;
+                    System.out.println("Error Assignation No.1 Linea: "+lineError);
                     isValid = false;
                 }
                 if(currentData[2].equals("enter()")){
@@ -220,6 +250,9 @@ public class AutomataController implements Initializable {
                     }
                     verified = patternId.matcher(identifier);
                     if(!verified.find()){
+                        lineError=position+1;
+                        mensajeError = mensajeError+"\nError Assignation No.2 Linea: "+lineError;
+                        System.out.println("Error Assignation No.2 Linea: "+lineError);
                         isValid = false;
                     }
                 }
@@ -238,18 +271,30 @@ public class AutomataController implements Initializable {
                         }
                         verified = patternId.matcher(identifier);
                         if(!verified.find()){
+                            lineError=position+1;
+                            mensajeError = mensajeError+"\nError Assignation No.3 Linea: "+lineError;
+                            System.out.println("Error Assignation No.3 Linea: "+lineError);
                             isValid = false;
                         }
                     } else if(identifiers[i].isBlank()){
+                        lineError=position+1;
+                        mensajeError = mensajeError+"\nError Assignation No.4 Linea: "+lineError;
+                        System.out.println("Error Assignation No.4 Linea: "+lineError);
                         isValid = false;
                     }
                 }
                 position++;
             } else {
+                lineError=position+1;
+                mensajeError = mensajeError+"\nError Assignation No.5 Linea: "+lineError;
+                System.out.println("Error Assignation No.5 Linea: "+lineError);
                 position++;
                 isValid = false;
             }
         }else{
+            lineError=position+1;
+            mensajeError = mensajeError+"\nError Assignation No.6 Linea: "+lineError;
+            System.out.println("Error Assignation No.6 Linea: "+lineError);
             position++;
             isValid = false;
         }
@@ -291,9 +336,15 @@ public class AutomataController implements Initializable {
                 patternId = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
                 verified = patternId.matcher(identifier);
                 if (!verified.find()){
+                    lineError=position+1;
+                    mensajeError = mensajeError+"\nError Data No.1 Linea: "+lineError;
+                    System.out.println("Error Data No.1 Linea: "+lineError);
                     isValid = false;
                 }
                 if(currentData[1].lastIndexOf(';') != currentData[1].length() - 1 ){
+                    lineError=position+1;
+                    mensajeError = mensajeError+"\nError Data No.2 Linea: "+lineError;
+                    System.out.println("Error Data No.2 Linea: "+lineError);
                     isValid = false;
                 }
                 position++;
@@ -301,9 +352,15 @@ public class AutomataController implements Initializable {
                 patternId = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
                 verified = patternId.matcher(currentData[1]);
                 if(!verified.find()){
+                    lineError=position+1;
+                    mensajeError = mensajeError+"\nError Data No.3 Linea: "+lineError;
+                    System.out.println("Error Data No.3 Linea: "+lineError);
                     isValid = false;
                 }
                 if(!currentData[2].equals("=")){
+                    lineError=position+1;
+                    mensajeError = mensajeError+"\nError Data No.4 Linea: "+lineError;
+                    System.out.println("Error Data No.4 Linea: "+lineError);
                     isValid = false;
                 }
                 if(currentData[3].indexOf("enter") > -1){
@@ -322,19 +379,31 @@ public class AutomataController implements Initializable {
                         }
                         verified = patternId.matcher(parameters[i]);
                         if(!verified.find()){
+                            lineError=position+1;
+                            mensajeError = mensajeError+"\nError Data No.5 Linea: "+lineError;
+                            System.out.println("Error Data No.5 Linea: "+lineError);
                             isValid = false;
                         }
                     }
                     position++;
                 }else{
+                    lineError=position+1;
+                    mensajeError = mensajeError+"\nError Data No.6 Linea: "+lineError;
+                    System.out.println("Error Data No.6 Linea: "+lineError);
                     position++;
                     isValid = false;
                 }
             }else{
+                lineError=position+1;
+                mensajeError = mensajeError+"\nError Data No.7 Linea: "+lineError;
+                System.out.println("Error Data No.7 Linea: "+lineError);
                 position++;
                 isValid = false;
             }
         }else{
+            lineError=position+1;
+            mensajeError = mensajeError+"\nError Data No.8 Linea: "+lineError;
+            System.out.println("Error Data No.8 Linea: "+lineError);
             position++;
             isValid = false;
         }
@@ -347,15 +416,27 @@ public class AutomataController implements Initializable {
         String complement = currentData.substring(currentData.indexOf("enter")+5, currentData.length());
         if(complement.length() >= 3){
             if(complement.charAt(0) != '('){
+                lineError=position+1;
+                mensajeError = mensajeError+"\nError Enter No.1 Linea: "+lineError;
+                System.out.println("Error Enter No.1 Linea: "+lineError);
                 isValid = false;
             }
             if(complement.charAt(1) != ')'){
+                lineError=position+1;
+                mensajeError = mensajeError+"\nError Enter No.2 Linea: "+lineError;
+                System.out.println("Error Enter No.2 Linea: "+lineError);
                 isValid = false;
             }
             if(complement.charAt(complement.length() - 1) != ';'){
+                lineError=position+1;
+                mensajeError = mensajeError+"\nError Enter No.3 Linea: "+lineError;
+                System.out.println("Error Enter No.3 Linea: "+lineError);
                 isValid = false;
             }
         }else{
+            lineError=position+1;
+            mensajeError = mensajeError+"\nError Enter No.4 Linea: "+lineError;
+            System.out.println("Error Enter No.4 Linea: "+lineError);
             isValid = false;
         }
         position++;
@@ -375,13 +456,22 @@ public class AutomataController implements Initializable {
                             for (int x = 0; x < outputPosition; x++) {
                                 String currentValue = "" + text[position].charAt(x);
                                 if (!(currentValue.isEmpty() || currentValue.isBlank())) {
+                                    lineError=position+1;
+                                    mensajeError = mensajeError+"\nError Ignore No.1 Linea: "+lineError;
+                                    System.out.println("Error Ignore No.1 Linea: "+lineError);
                                     isValid = false;
                                 }
                             }
                             if (!text[position].substring(outputPosition, outputPosition + wordLength).equals("ignore(")) {
+                                lineError=position+1;
+                                mensajeError = mensajeError+"\nError Ignore No.2 Linea: "+lineError;
+                                System.out.println("Error Ignore No.2 Linea: "+lineError);
                                 isValid = false;
                             }
                         } else {
+                            lineError=position+1;
+                            mensajeError = mensajeError+"\nError Ignore No.3 Linea: "+lineError;
+                            System.out.println("Error Ignore No.3 Linea: "+lineError);
                             isValid = false;
                         }
                         break;
@@ -391,6 +481,9 @@ public class AutomataController implements Initializable {
                             int j=0;
                             String[] outputs = text[position].substring(outputPosition + wordLength).split(" ");
                             if(outputs.length < 3){
+                                lineError=position+1;
+                                mensajeError = mensajeError+"\nError Ignore No.4 Linea: "+lineError;
+                                System.out.println("Error Enter No.4 Linea: "+lineError);
                                 isValid = false;
                             }
                             while(!finished){
@@ -401,6 +494,9 @@ public class AutomataController implements Initializable {
                                         if (verified.find()) {
                                             iteration++;
                                         } else {
+                                            lineError=position+1;
+                                            mensajeError = mensajeError+"\nError Ignore No.5 Linea: "+lineError;
+                                            System.out.println("Error Ignore No.5 Linea: "+lineError);
                                             isValid = false;
                                         }
                                         j++;
@@ -414,9 +510,15 @@ public class AutomataController implements Initializable {
                             if(outputs[j].equals(")")){
                                 j++;
                                 if(!outputs[j].equals(";")){
+                                    lineError=position+1;
+                                    mensajeError = mensajeError+"\nError Ignore No.6 Linea: "+lineError;
+                                    System.out.println("Error Ignore No.6 Linea: "+lineError);
                                     isValid = false;
                                 }
                             } else {
+                                lineError=position+1;
+                                mensajeError = mensajeError+"\nError Ignore No.7 Linea: "+lineError;
+                                System.out.println("Error Ignore No.7 Linea: "+lineError);
                                 isValid = false;
                             }
                         }
@@ -445,18 +547,30 @@ public class AutomataController implements Initializable {
                         for (int x = 0; x < conditionPosition; x++) {
                             String currentValue = "" + text[position].charAt(x);
                             if (!(currentValue.isEmpty() || currentValue.isBlank())) {
+                                lineError=position+1;
+                                mensajeError = mensajeError+"\nError Condition No.1 Linea: "+lineError;
+                                System.out.println("Error Condition No.1 Linea: "+lineError);
                                 isValid = false;
                             }
                         }
 
                         if(conditionPosition + wordLength <= text[position].length()) {
                             if (!text[position].substring(conditionPosition, conditionPosition + wordLength).equals("condition(")) {
+                                lineError=position+1;
+                                mensajeError = mensajeError+"\nError Condition No.2 Linea: "+lineError;
+                                System.out.println("Error Condition No.2 Linea: "+lineError);
                                 isValid = false;
                             }
                         } else {
+                            lineError=position+1;
+                            mensajeError = mensajeError+"\nError Condition No.3 Linea: "+lineError;
+                            System.out.println("Error Condition No.3 Linea: "+lineError);
                             isValid = false;
                         }
                     }  else {
+                        lineError=position+1;
+                        mensajeError = mensajeError+"\nError Condition No.4 Linea: "+lineError;
+                        System.out.println("Error Condition No.4 Linea: "+lineError);
                         isValid = false;
                     }
                 break;
@@ -468,9 +582,15 @@ public class AutomataController implements Initializable {
                         if(conditionPosition + wordLength < text[position].length()) {
                             conditions = text[position].substring(conditionPosition + wordLength).split(" ");
                             if (conditions.length < 3) {
+                                lineError=position+1;
+                                mensajeError = mensajeError+"\nError Condition No.5 Linea: "+lineError;
+                                System.out.println("Error Condition No.5 Linea: "+lineError);
                                 isValid = false;
                             }
                         } else {
+                            lineError=position+1;
+                            mensajeError = mensajeError+"\nError Condition No.6 Linea: "+lineError;
+                            System.out.println("Error Condition No.6 Linea: "+lineError);
                             isValid = false;
                         }
                         while(!finished && isValid){
@@ -484,19 +604,31 @@ public class AutomataController implements Initializable {
                                             j++;
                                             verified = identifier.matcher(conditions[j]);
                                             if (!verified.find()) {
+                                                lineError=position+1;
+                                                mensajeError = mensajeError+"\nError Condition No.7 Linea: "+lineError;
+                                                System.out.println("Error Condition No.7 Linea: "+lineError);
                                                 isValid = false;
                                             }
                                             iteration++;
                                         } else {
+                                            lineError=position+1;
+                                            mensajeError = mensajeError+"\nError Condition No.8 Linea: "+lineError;
+                                            System.out.println("Error Condition No.8 Linea: "+lineError);
                                             isValid = false;
                                         }
 
                                     } else {
+                                        lineError=position+1;
+                                        mensajeError = mensajeError+"\nError Condition No.9 Linea: "+lineError;
+                                        System.out.println("Error Condition No.9 Linea: "+lineError);
                                         isValid = false;
                                     }
                                     j++;
                                 } else {
                                     if( !(conditions[j].equals("||") || conditions[j].equals("&&")) ){
+                                        lineError=position+1;
+                                        mensajeError = mensajeError+"\nError Condition No.10 Linea: "+lineError;
+                                        System.out.println("Error Condition No.10 Linea: "+lineError);
                                         isValid = false;
                                     }
                                     iteration = 0;
@@ -512,12 +644,21 @@ public class AutomataController implements Initializable {
                             if (conditions[j].equals(")")) {
                                 j++;
                                 if (!conditions[j].equals("{")) {
+                                    lineError=position+1;
+                                    mensajeError = mensajeError+"\nError Condition No.11 Linea: "+lineError;
+                                    System.out.println("Error Condition No.11 Linea: "+lineError);
                                     isValid = false;
                                 }
                             } else {
+                                lineError=position+1;
+                                mensajeError = mensajeError+"\nError Condition No.12 Linea: "+lineError;
+                                System.out.println("Error Condition No.12 Linea: "+lineError);
                                 isValid = false;
                             }
                         } else {
+                            lineError=position+1;
+                            mensajeError = mensajeError+"\nError Condition No.13 Linea: "+lineError;
+                            System.out.println("Error Condition No.13 Linea: "+lineError);
                             isValid =false;
                         }
 
@@ -556,6 +697,9 @@ public class AutomataController implements Initializable {
                     }
 
                     if(closingSymbols > 1){
+                        lineError=position+1;
+                        mensajeError = mensajeError+"\nError Condition No.14 Linea: "+lineError;
+                        System.out.println("Error Condition No.14 Linea: "+lineError);
                         isValid = false;
                     }
                 }
@@ -564,6 +708,9 @@ public class AutomataController implements Initializable {
                     recursive = Boolean.parseBoolean(contentResult[0]);
                     position = Integer.parseInt(contentResult[1]);
                     if (!(isValid && recursive)) {
+                        lineError = position+1;
+                        mensajeError = mensajeError+"\nError Condition No.15 Linea: "+lineError;
+                        System.out.println("Error Condition No.15 Linea: "+lineError);
                         isValid = false;
                     }
                 } else {
@@ -606,6 +753,9 @@ public class AutomataController implements Initializable {
                             }
 
                             if(closingSymbols > 1){
+                                lineError=position+1;
+                                mensajeError = mensajeError+"\nError Condition/Fail No.16 Linea: "+lineError;
+                                System.out.println("Error Condition/Fail No.16 Linea: "+lineError);
                                 isValid = false;
                             }
                         }
@@ -614,6 +764,9 @@ public class AutomataController implements Initializable {
                             recursive = Boolean.parseBoolean(contentResult[0]);
                             position = Integer.parseInt(contentResult[1]);
                             if (!(isValid && recursive)) {
+                                lineError = position+1;
+                                mensajeError = mensajeError+"\nError Condition/Fail No.17 Linea: "+lineError;
+                                System.out.println("Error Condition/Fail No.17 Linea: "+lineError);
                                 isValid = false;
                             }
                         } else {
@@ -647,17 +800,29 @@ public class AutomataController implements Initializable {
                             for (int x = 0; x < outputPosition; x++) {
                                 String currentValue = "" + text[position].charAt(x);
                                 if (!(currentValue.isEmpty() || currentValue.isBlank())) {
+                                    lineError=position+1;
+                                    mensajeError = mensajeError+"\nError Output No.1 Linea: "+lineError;
+                                    System.out.println("Error Output No.1 Linea: "+lineError);
                                     isValid = false;
                                 }
                             }
                             if(outputPosition + wordLength < text[position].length()) {
                                 if (!text[position].substring(outputPosition, outputPosition + wordLength).equals("output(")) {
+                                    lineError=position+1;
+                                    mensajeError = mensajeError+"\nError Output No.2 Linea: "+lineError;
+                                    System.out.println("Error Output No.2 Linea: "+lineError);
                                     isValid = false;
                                 }
                             } else {
+                                lineError=position+1;
+                                mensajeError = mensajeError+"\nError Output No.3 Linea: "+lineError;
+                                System.out.println("Error Output No.3 Linea: "+lineError);
                                 isValid = false;
                             }
                         } else {
+                            lineError=position+1;
+                            mensajeError = mensajeError+"\nError Output No.4 Linea: "+lineError;
+                            System.out.println("Error Output No.4 Linea: "+lineError);
                             isValid = false;
                         }
                     break;
@@ -674,11 +839,17 @@ public class AutomataController implements Initializable {
                                         if (verified.find()) {
                                             iteration++;
                                         } else {
+                                            lineError=position+1;
+                                            mensajeError = mensajeError+"\nError Output No.5 Linea: "+lineError;
+                                            System.out.println("Error Output No.5 Linea: "+lineError);
                                             isValid = false;
                                         }
                                         j++;
                                     } else {
                                         if( !(outputs[j].equals("+")) ){
+                                            lineError=position+1;
+                                            mensajeError = mensajeError+"\nError Output No.6 Linea: "+lineError;
+                                            System.out.println("Error Output No.6 Linea: "+lineError);
                                             isValid = false;
                                         }
                                         iteration = 0;
@@ -693,9 +864,15 @@ public class AutomataController implements Initializable {
                             if(outputs[j].equals(")")){
                                 j++;
                                 if(!outputs[j].equals(";")){
+                                    lineError=position+1;
+                                    mensajeError = mensajeError+"\nError Output No.7 Linea: "+lineError;
+                                    System.out.println("Error Output No.7 Linea: "+lineError);
                                     isValid = false;
                                 }
                             } else {
+                                lineError=position+1;
+                                mensajeError = mensajeError+"\nError Output No.8 Linea: "+lineError;
+                                System.out.println("Error Output No.8 Linea: "+lineError);
                                 isValid = false;
                             }
                         }
@@ -750,11 +927,17 @@ public class AutomataController implements Initializable {
             position++;
             recursive = true;
         } else {
+            lineError=position+1;
+            mensajeError = mensajeError+"\nError Contenido No.1 Linea: "+lineError;
+            System.out.println("Error Contendio No.1 Linea: "+lineError);
             isValid = false;
             position++;
         }
 
         if(!(isValid && recursive)){
+            lineError=position+1;
+            mensajeError = mensajeError+"\nError Contenido No.2 Linea: "+lineError;
+            System.out.println("Error Contenido No.2 Linea: "+lineError);
             isValid = false;
         }
 
@@ -766,7 +949,8 @@ public class AutomataController implements Initializable {
         alert.setHeaderText(null);
         alert.setTitle(title);
 
-        TextArea area = new TextArea(content);
+        TextArea area = new TextArea();
+        area.setText(content);
         area.setWrapText(true);
         area.setEditable(false);
 
