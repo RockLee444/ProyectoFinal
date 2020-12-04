@@ -75,7 +75,7 @@ public class AutomataController implements Initializable {
         }
 
         if(!error){
-            showAlert("HECHO", "Todo salió bien :)",AlertType.CONFIRMATION);
+            showAlert("HECHO", "Ejecución exitosa",AlertType.CONFIRMATION);
         } else {
             showAlert("ERROR", "Hay un error! En la linea: "+"\n"+mensajeError,AlertType.ERROR);
             mensajeError = " ";
@@ -285,7 +285,6 @@ public class AutomataController implements Initializable {
                 }
                 position++;
             } else {
-                System.out.println("");
                 lineError=position+1;
                 mensajeError = mensajeError+"\nError Assignation No.5 Linea: "+lineError;
                 System.out.println("Error Assignation No.5 Linea: "+lineError);
@@ -309,7 +308,7 @@ public class AutomataController implements Initializable {
         Pattern patternId;
         Matcher verified;
         String[] currentData = txt.split(" ");
-        if(txt.lastIndexOf('=') > 0 && txt.lastIndexOf('=') < txt.length() - 1){
+        if(txt.lastIndexOf('=') > 0 && txt.lastIndexOf('=') < txt.length() - 1 ){
             if(txt.charAt(txt.lastIndexOf('=') - 1) != ' ' && txt.charAt(txt.lastIndexOf('=') + 1) != ' ' ){
                 txt = txt.substring(0,txt.lastIndexOf('=')) +" = "+txt.substring(txt.lastIndexOf('=')+1, txt.length());
             } else if(txt.charAt(txt.lastIndexOf('=') - 1) == ' ' && txt.charAt(txt.lastIndexOf('=') + 1) != ' ' ){
@@ -343,7 +342,6 @@ public class AutomataController implements Initializable {
                 String identifier = currentData[1].substring(0, currentData[1].lastIndexOf(';'));
                 patternId = Pattern.compile("(^[a-zA-Z_]+[\\w]*|[\\d]+)$");
                 verified = patternId.matcher(identifier);
-
                 if (!verified.find()){
                     lineError=position+1;
                     mensajeError = mensajeError+"\nError Data No.1 Linea: "+lineError;
@@ -649,28 +647,29 @@ public class AutomataController implements Initializable {
                                 finished = true;
                             }
                         }
-                        if(j +1 < conditions.length) {
-                            if (conditions[j].equals(")")) {
-                                j++;
-                                if (!conditions[j].equals("{")) {
-                                    lineError=position+1;
-                                    mensajeError = mensajeError+"\nError Condition No.11 Linea: "+lineError;
-                                    System.out.println("Error Condition No.11 Linea: "+lineError);
+                        if(conditions != null) {
+                            if (j + 1 < conditions.length) {
+                                if (conditions[j].equals(")")) {
+                                    j++;
+                                    if (!conditions[j].equals("{")) {
+                                        lineError = position + 1;
+                                        mensajeError = mensajeError + "\nError Condition No.11 Linea: " + lineError;
+                                        System.out.println("Error Condition No.11 Linea: " + lineError);
+                                        isValid = false;
+                                    }
+                                } else {
+                                    lineError = position + 1;
+                                    mensajeError = mensajeError + "\nError Condition No.12 Linea: " + lineError;
+                                    System.out.println("Error Condition No.12 Linea: " + lineError);
                                     isValid = false;
                                 }
                             } else {
-                                lineError=position+1;
-                                mensajeError = mensajeError+"\nError Condition No.12 Linea: "+lineError;
-                                System.out.println("Error Condition No.12 Linea: "+lineError);
+                                lineError = position + 1;
+                                mensajeError = mensajeError + "\nError Condition No.13 Linea: " + lineError;
+                                System.out.println("Error Condition No.13 Linea: " + lineError);
                                 isValid = false;
                             }
-                        } else {
-                            lineError=position+1;
-                            mensajeError = mensajeError+"\nError Condition No.13 Linea: "+lineError;
-                            System.out.println("Error Condition No.13 Linea: "+lineError);
-                            isValid =false;
                         }
-
                     }
                 break;
             }
